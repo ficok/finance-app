@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "utilities.h"
 #include "logging.h"
 #include "error_codes.h"
 #include "reservation.h"
@@ -18,13 +19,14 @@ extern int write_log(char *message)
     return CANT_OPEN_FILE;
   }
   
-  time_t now; time(&now);
-  struct tm *local_time = localtime(&now);
-  char date[10];
-  int day = local_time->tm_mday;
-  int month = local_time->tm_mon + 1;
-  int year = local_time->tm_year + 1900;
-  sprintf(date, "%d/%d/%d", day, month, year);
+  // time_t now; time(&now);
+  // struct tm *local_time = localtime(&now);
+  // char date[10];
+  // int day = local_time->tm_mday;
+  // int month = local_time->tm_mon + 1;
+  // int year = local_time->tm_year + 1900;
+  // sprintf(date, "%d/%d/%d", day, month, year);
+  char *date = create_current_date();
   char final_message[MESSAGE_LEN];
   strcpy(final_message, date);
   strcat(final_message, ",");
@@ -32,6 +34,11 @@ extern int write_log(char *message)
   
   fprintf(log_file, "%s\n", final_message);
   fclose(log_file);
+  /**
+   * THIS VARIABLE WAS MALLOC-ED IN THE create_current_date FUNCTION, BUT WASN'T FREED THERE
+   * YOU MUST FREE IT HERE
+  */
+  free(date);
   
   return OK;
 }
@@ -64,16 +71,24 @@ extern int log_new_reservation(reservation_t reservation)
     return CANT_OPEN_FILE;
   }
   
-  /* DODAJ DATUM U LOG */
+  char *date = create_current_date();
+  char final_message[MESSAGE_LEN];
+  char message[1024];
   
+  sprintf(message, "name,%s,current fund,%d,goal,%d\n", reservation.name, reservation.current_fund, reservation.goal);
+  
+  strcpy(final_message, date);
+  strcat(final_message, ",");
+  strcat(final_message, message);
+  
+  fprintf(reservation_log_file, "%s\n", final_message);
   // ako pravi dva newline, onda obrisi newline iz formata ispod
-  fprintf(reservation_log_file, "name,%s,current fund,%d,goal,%\nd", reservation.name, reservation.current_fund, reservation.goal);
   fclose(reservation_log_file);
 
   return OK;
 }
 
-extern int print_reservation_logs()
+extern int print_reservation_log()
 {
   return OK;
 }

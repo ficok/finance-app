@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "library/utilities.h"
 #include "library/adding_funds.h"
 #include "library/spending_funds.h"
 #include "library/reservation.h"
@@ -12,7 +13,7 @@
 int available;
 int reserved;
 
-int main(int argc, char **argv)
+int main()
 {
   bool exit_flag = false;
   
