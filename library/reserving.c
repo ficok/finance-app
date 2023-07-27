@@ -14,10 +14,11 @@ int reserve()
   
   while (!exit_flag)
   {
-    printf("what would you like to do:\n  [1] create a new reservation\n  [2] update a reservation\n  [3] show reservation logs\n  [4] go back\nyour choice: ");
+    printf("what would you like to do:\n  [1] create a new reservation\n  [2] update a reservation\n  [3] check a reservation\n  [4] show reservation logs\n  [5] go back\nyour choice: ");
   
     char choice;
     scanf("%c",&choice);
+    printf("%s", DIVIDER);
     switch(choice)
     {
       case '1':

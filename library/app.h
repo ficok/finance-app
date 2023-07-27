@@ -3,6 +3,5 @@
 
 extern int available;
 extern int reserved;
-extern void flush_input_buffer(void);
 
 #endif

@@ -21,3 +21,20 @@ char *create_current_date(void)
   */
   return date;
 }
+
+void flush_input_buffer(void)
+{
+  int c;
+  while ((c = getchar()) != '\n' && c != EOF);
+  
+  return;
+}
+
+void shave_newline(char *line)
+{
+  int line_len = strlen(line);
+  if(line_len > 0 && line[line_len - 1] == '\n')
+    line[line_len - 1] = '\0';
+
+  return;
+}

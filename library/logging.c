@@ -53,6 +53,7 @@ extern int print_log(void)
   }
   
   char buffer[MESSAGE_LEN];
+  printf("transaction log file:\n~~~~~~~~~~~~~~~~~~~~~\n");
   while(fgets(buffer, MESSAGE_LEN, log_file) != NULL)
   {
     printf("%s", buffer);
@@ -62,7 +63,7 @@ extern int print_log(void)
   return OK;
 }
 
-extern int log_new_reservation(reservation_t reservation)
+extern int log_new_reservation(reservation_t *reservation)
 {
   FILE *reservation_log_file = fopen("account_data/reservation_log", "a");
   if(reservation_log_file == NULL)
@@ -75,14 +76,14 @@ extern int log_new_reservation(reservation_t reservation)
   char final_message[MESSAGE_LEN];
   char message[1024];
   
-  sprintf(message, "name,%s,current fund,%d,goal,%d\n", reservation.name, reservation.current_fund, reservation.goal);
+  sprintf(message, "name,%s,current fund,%d,goal,%d\n", reservation->name, reservation->current_fund, reservation->goal);
   
   strcpy(final_message, date);
   strcat(final_message, ",");
   strcat(final_message, message);
   
-  fprintf(reservation_log_file, "%s\n", final_message);
-  // ako pravi dva newline, onda obrisi newline iz formata ispod
+  fprintf(reservation_log_file, "%s", final_message);
+
   fclose(reservation_log_file);
 
   return OK;
@@ -90,5 +91,26 @@ extern int log_new_reservation(reservation_t reservation)
 
 extern int print_reservation_log()
 {
+  FILE *reservation_log_file = fopen("account_data/reservation_log", "r");
+  if(reservation_log_file == NULL)
+  {
+    fprintf(stderr, "unable to open reservation log file.\n");
+    return CANT_OPEN_FILE;
+  }
+  
+  char buffer[MESSAGE_LEN];
+  printf("reservation log file:\n~~~~~~~~~~~~~~~~~~~~~\n");
+  while(fgets(buffer, MESSAGE_LEN, reservation_log_file) != NULL)
+  {
+    printf("%s", buffer);
+  }
+  if (!feof(reservation_log_file))
+  {
+    fclose(reservation_log_file);
+    return CANT_READ_FILE;
+  }
+  
+  fclose(reservation_log_file);
+  
   return OK;
 }

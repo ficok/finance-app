@@ -5,6 +5,7 @@
     "error_codes.h": "c",
     "adding_funds.h": "c",
     "app.h": "c",
-    "logging.h": "c"
+    "logging.h": "c",
+    "reservation.h": "c"
   }
 }

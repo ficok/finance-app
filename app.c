@@ -25,7 +25,7 @@ int main()
     
     char choice;
     scanf("%c",&choice);
-    
+    printf("%s", DIVIDER);
     switch(choice)
     {
       case '1':
@@ -54,12 +54,4 @@ int main()
     }
     flush_input_buffer();
   }
-}
-
-void flush_input_buffer(void)
-{
-  int c;
-  while ((c = getchar()) != '\n' && c != EOF);
-  
-  return;
 }
