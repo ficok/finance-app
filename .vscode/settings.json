@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.ejs": "html",
+    "loading.h": "c",
+    "error_codes.h": "c",
+    "adding_funds.h": "c",
+    "app.h": "c",
+    "logging.h": "c"
+  }
+}
