@@ -3,5 +3,6 @@
 
 extern int available;
 extern int reserved;
+extern int num_of_reservations;
 
 #endif

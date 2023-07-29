@@ -6,6 +6,8 @@
     "adding_funds.h": "c",
     "app.h": "c",
     "logging.h": "c",
-    "reservation.h": "c"
+    "reservation.h": "c",
+    "utility_codes.h": "c",
+    "utilities.h": "c"
   }
 }

@@ -6,9 +6,10 @@
 #include "utilities.h"
 #include "logging.h"
 #include "error_codes.h"
+#include "utility_codes.h"
 #include "reservation.h"
 
-#define MESSAGE_LEN 1040
+
 
 extern int write_log(char *message)
 {
@@ -19,13 +20,6 @@ extern int write_log(char *message)
     return CANT_OPEN_FILE;
   }
   
-  // time_t now; time(&now);
-  // struct tm *local_time = localtime(&now);
-  // char date[10];
-  // int day = local_time->tm_mday;
-  // int month = local_time->tm_mon + 1;
-  // int year = local_time->tm_year + 1900;
-  // sprintf(date, "%d/%d/%d", day, month, year);
   char *date = create_current_date();
   char final_message[MESSAGE_LEN];
   strcpy(final_message, date);
@@ -35,7 +29,7 @@ extern int write_log(char *message)
   fprintf(log_file, "%s\n", final_message);
   fclose(log_file);
   /**
-   * THIS VARIABLE WAS MALLOC-ED IN THE create_current_date FUNCTION, BUT WASN'T FREED THERE
+   * date VARIABLE WAS MALLOC-ED IN THE create_current_date FUNCTION, BUT WASN'T FREED THERE
    * YOU MUST FREE IT HERE
   */
   free(date);
@@ -63,28 +57,32 @@ extern int print_log(void)
   return OK;
 }
 
-extern int log_new_reservation(reservation_t *reservation)
+extern int log_reservation(reservation_t *reservation, int type)
 {
-  FILE *reservation_log_file = fopen("account_data/reservation_log", "a");
-  if(reservation_log_file == NULL)
-  {
-    fprintf(stderr, "unable to open reservation log file.\n");
-    return CANT_OPEN_FILE;
-  }
-  
-  char *date = create_current_date();
-  char final_message[MESSAGE_LEN];
-  char message[1024];
-  
-  sprintf(message, "name,%s,current fund,%d,goal,%d\n", reservation->name, reservation->current_fund, reservation->goal);
-  
-  strcpy(final_message, date);
-  strcat(final_message, ",");
-  strcat(final_message, message);
-  
-  fprintf(reservation_log_file, "%s", final_message);
+  if(type == NEW_RESERVATION)
+  { /** new reservation log */
+    log_reservation_helper(reservation, "new reservation");
 
-  fclose(reservation_log_file);
+    FILE *reservations_file = fopen("account_data/reservations", "a");
+    if(reservations_file == NULL)
+    {
+      fprintf(stderr, "unable to open reservation names file.\n");
+      return CANT_OPEN_FILE;
+    }
+    
+    char message[MESSAGE_LEN];
+    sprintf(message, "%d,%s,%d,%d\n", reservation->id, reservation->name, reservation->current_fund, reservation->goal);
+    
+    fclose(reservations_file);
+  }
+  else if(type == UPDATE_RESERVATION)
+  { /** reservation update log */
+    
+  }
+  else /** type == DELETE_RESERVATION */
+  { /** reservation deletion log */
+
+  }
 
   return OK;
 }
@@ -110,6 +108,32 @@ extern int print_reservation_log()
     return CANT_READ_FILE;
   }
   
+  fclose(reservation_log_file);
+  
+  return OK;
+}
+
+int log_reservation_helper(reservation_t *reservation, char *type)
+{
+  FILE *reservation_log_file = fopen("account_data/reservation_log", "a");
+  if(reservation_log_file == NULL)
+  {
+    fprintf(stderr, "unable to open reservation log file.\n");
+    return CANT_OPEN_FILE;
+  }
+  
+  char *date = create_current_date();
+  char final_message[MESSAGE_LEN];
+  char message[1024];
+    
+  sprintf(message, "%d,%s,%d,%d,%s\n", reservation->id, reservation->name, reservation->current_fund, reservation->goal, type);
+    
+  strcpy(final_message, date);
+  strcat(final_message, ",");
+  strcat(final_message, message);
+    
+  fprintf(reservation_log_file, "%s", final_message);
+
   fclose(reservation_log_file);
   
   return OK;

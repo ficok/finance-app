@@ -3,6 +3,7 @@
 
 typedef struct
 {
+  int id;
   char name[100];
   int goal;
   int current_fund;

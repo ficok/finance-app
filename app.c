@@ -12,6 +12,7 @@
 
 int available;
 int reserved;
+int num_of_reservations;
 
 int main()
 {
