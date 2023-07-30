@@ -7,16 +7,7 @@
 #include "utilities.h"
 #include "error_codes.h"
 #include "utility_codes.h"
-
-/**
- * used for searching through the reservation search list file
-*/
-typedef struct
-{
-  int index;
-  int id;
-  char *name;
-} reservation_triplet_t;
+#include "loading.h"
 
 char DIVIDER[] = "-------------------\n\n";
 
@@ -52,7 +43,7 @@ void shave_newline(char *line)
   return;
 }
 
-int search_for_reservation(char *target)
+interval_t search_for_reservation(reservation_t *reservation_list, char *target)
 {
   /**
    * 1. load the reservations
@@ -67,63 +58,47 @@ int search_for_reservation(char *target)
   {
     fprintf(stderr, "unable to open reservations file.\n");
   }
-  
-  reservation_t *reservation_list = malloc(num_of_reservations * sizeof(reservation_t));
-  if(reservation_list == NULL)
-  {
-    fprintf(stderr, "unable to allocate memory for reservation triplet for searching.\n");
-    free(reservation_list);
-  }
-  
-  int iterator = 0;
-  char *buffer[MESSAGE_LEN];
-  while(fgets(buffer, MESSAGE_LEN, reservations_file) != NULL)
-  {
-    char *token = NULL;
-    token = strtok(buffer, ",");
-    reservation_list[iterator].id = atoi(token);
-    
-    token = strtok(NULL, ",");
-    shave_newline(token);
 
-    strcpy(reservation_list[iterator].name, token);
-    
-    token = strtok(NULL, ",");
-    reservation_list[iterator].goal = atoi(token);
-    
-    token = strtok(NULL, ",");
-    reservation_list[iterator].current_fund = atoi(token);
-
-    iterator++;
-  }
-  if (!feof(reservations_file))
-  {
-    fprintf(stderr, "unable to read reservation search list file.\n");
-  }
-  fclose(reservations_file);
-  /** loading done */
-  
   /** binary search */
   int left_end, right_end;
   binary_search_ret_interval(reservation_list, target, &left_end, &right_end);
-  /** binary search done; interval acquired */
   
-  /** printing the interval */
+  interval_t interval = {
+    left_end,
+    right_end
+  };
+  
   if(left_end == NOT_FOUND || right_end == NOT_FOUND)
-  {
-    printf("reservation with %s name or keyword not found.\n", target);
-    free(reservation_list);
-    return OK;
-  }
+    interval.found_flag = NOT_FOUND;
+  else
+    interval.found_flag = FOUND;
+  /** binary search done; interval acquired */
 
-  for (int i = left_end; i < (right_end + 1); i++)
-  {
-    print_reservation(reservation_list[i]);
-  }
-  /** printing done */
+  return interval;
+}
+
+int rename_reservation(reservation_t *reservation)
+{
+  char name[MESSAGE_LEN];
+  printf("enter new name: ");
+  flush_input_buffer();
+  fgets(name, MESSAGE_LEN, stdin);
+  flush_input_buffer();
   
-  /** deallocating */
-  free(reservation_list);
+  strcpy(reservation->name, name);
+  
+  return OK;
+}
+
+int update_funding(reservation_t *reservation)
+{
+  int current_funding;
+  printf("add funding: ");
+  flush_input_buffer();
+  scanf("%d", &current_funding);
+  flush_input_buffer();
+  
+  reservation->current_fund = current_funding;
   
   return OK;
 }
@@ -182,7 +157,93 @@ int upper_bound(reservation_t *reservation_list, char* target)
     return NOT_FOUND;
 }
 
-int sort_reservations_file(void)
+int swap_reservations(reservation_t *reservation1, reservation_t *reservation2)
 {
+  reservation_t *temp;
+  *temp = *reservation1;
+  *reservation1 = *reservation2;
+  *reservation2 = *temp;
+  
+  return OK;
+}
+
+int partition(reservation_t *reservation_list, int left, int right)
+{
+  char *pivot = reservation_list[right].name;
+  
+  int i = (left - 1);
+  
+  for(int j = left; j < right; j++)
+  {
+    if(strcmp(reservation_list[j].name, pivot) < 0)
+    {
+      i++;
+      swap_reservations(&reservation_list[i], &reservation_list[j]);
+    }
+  }
+  
+  int pivot_index = (i + 1);
+  swap_reservations(&reservation_list[pivot_index], &reservation_list[right]);
+  
+  return pivot;
+}
+
+int quick_sort_reservation_list(reservation_t *reservation_list, int left, int right)
+{
+  if(left < right)
+  {
+    char *pivot = partition(reservation_list, 0, (num_of_reservations - 1));
+    quick_sort_reservation_list(reservation_list, left, (pivot - 1));
+    quick_sort_reservation_list(reservation_list, (pivot + 1), right);
+  }
+
+  return OK;
+}
+
+int sort_reservations_file_with_loading(void)
+{
+  reservation_t *reservation_list = malloc(num_of_reservations * sizeof(reservation_t));
+  // check for error
+  
+  load_reservations(reservation_list);
+  
+  quick_sort_reservation_list(reservation_list, 0, (num_of_reservations - 1));
+  
+  FILE *reservations_file = fopen("account_data/reservations","w");
+  // check for error
+  
+  for (int i = 0; i < num_of_reservations; i++)
+  {
+    fprintf(reservations_file, "%d,%s,%d,%d\n",
+            reservation_list[i].id, reservation_list[i].name,
+            reservation_list[i].goal, reservation_list[i].current_fund);
+  }
+  
+  fclose(reservations_file);
+  
+  return OK;
+}
+
+int sort_reservations_file(reservation_t *reservation_list)
+{
+  /**
+   * 1. sort reservation list with quick_sort_reservation_list
+   * 2. write the reservation_list to file
+  */
+ 
+  quick_sort_reservation_list(reservation_list, 0, (num_of_reservations - 1));
+  
+  FILE *reservations_file = fopen("account_data/reservations","w");
+  // check for error
+  
+  for (int i = 0; i < num_of_reservations; i++)
+  {
+    fprintf(reservations_file, "%d,%s,%d,%d\n",
+            reservation_list[i].id, reservation_list[i].name,
+            reservation_list[i].goal, reservation_list[i].current_fund);
+  }
+  
+  fclose(reservations_file);
+  
   return OK;
 }

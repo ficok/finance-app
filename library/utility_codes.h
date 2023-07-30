@@ -5,6 +5,7 @@
 #define UPDATE_RESERVATION 102
 #define DELETE_RESERVATION 103
 
-#define NOT_FOUND          201
+#define FOUND              201
+#define NOT_FOUND          202
 
 #endif

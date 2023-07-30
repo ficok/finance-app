@@ -20,7 +20,15 @@ int main()
   
   while (!exit_flag)
   {
-    load_data();
+    /**
+     * to lessen the footprint of this function, rework everything such that
+     * it is called only:
+     * 1. when program starts
+     * 2. after any changes are made
+     *    - new reservation
+     *    - update reservation
+     *    - delete reservation
+    */  load_data();
     printf("your available funds: %d\nyour reserved funds: %d\nwhat would you like to do?\n  [1] add funds\n  [2] spend funds\n  [3] reservations\n  [4] show log\n  [5] exit\nyour choice: ", available, reserved);
     
     
