@@ -5,12 +5,13 @@
 #include "spending_funds.h"
 #include "error_codes.h"
 #include "logging.h"
+#include "loading.h"
 
 extern int spend_funds()
 {
   int spent;
   printf("how much are you spending: ");
-  scanf("%d",&spent);
+  scanf("%d",&spent); getchar();
   
   FILE *available_file = fopen("account_data/available", "w");
   if(available_file == NULL)
@@ -25,6 +26,8 @@ extern int spend_funds()
   char message[1024];
   sprintf(message, "spent,%d,available,%d", spent, available-spent);
   write_log(message);
+  
+  load_data();
   
   return OK;
 }

@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -arch arm64
 
 # List of source files and corresponding object files
-SRCS = ./library/adding_funds.c ./library/spending_funds.c ./library/reserving.c ./library/loading.c ./library/logging.c ./library/reserving_functions.c ./library/utilities.c app.c
+SRCS = ./library/adding_funds.c ./library/loading.c ./library/logging.c ./library/reserving_functions.c ./library/reserving.c ./library/spending_funds.c ./library/utilities.c app.c
 OBJS = $(SRCS:.c=.o)
 
 # Name of the executable

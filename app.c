@@ -17,7 +17,7 @@ int num_of_reservations;
 int main()
 {
   bool exit_flag = false;
-  
+  load_data();
   while (!exit_flag)
   {
     /**
@@ -28,12 +28,12 @@ int main()
      *    - new reservation
      *    - update reservation
      *    - delete reservation
-    */  load_data();
-    printf("your available funds: %d\nyour reserved funds: %d\nwhat would you like to do?\n  [1] add funds\n  [2] spend funds\n  [3] reservations\n  [4] show log\n  [5] exit\nyour choice: ", available, reserved);
+    */ // load_data();
+    printf("your available funds: %d\nyour reserved funds: %d\nnumber of reservations: %d\nwhat would you like to do?\n  [1] add funds\n  [2] spend funds\n  [3] reservations\n  [4] show log\n  [5] exit\nyour choice: ", available, reserved, num_of_reservations);
     
     
     char choice;
-    scanf("%c",&choice);
+    scanf("%c",&choice); getchar();
     printf("%s", DIVIDER);
     switch(choice)
     {
@@ -61,6 +61,5 @@ int main()
         printf("%s", DIVIDER);
         break;
     }
-    flush_input_buffer();
   }
 }

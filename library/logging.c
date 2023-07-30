@@ -57,23 +57,25 @@ extern int print_log(void)
   return OK;
 }
 
+int log_new_reservation(reservation_t *reservation)
+{
+  FILE *reservations_file = fopen("account_data/reservations", "a");
+  // check error
+  
+  fprintf(reservations_file, "%s,%d,%d\n", reservation->name, reservation->goal, reservation->current_fund);
+  
+  fclose(reservations_file);
+  
+  return OK;
+}
+
 extern int log_reservation(reservation_t *reservation, int type)
 {
   if(type == NEW_RESERVATION)
   { /** new reservation log */
     log_reservation_helper(reservation, "new reservation");
-
-    FILE *reservations_file = fopen("account_data/reservations", "a");
-    if(reservations_file == NULL)
-    {
-      fprintf(stderr, "unable to open reservation names file.\n");
-      return CANT_OPEN_FILE;
-    }
     
-    char message[MESSAGE_LEN];
-    sprintf(message, "%d,%s,%d,%d\n", reservation->id, reservation->name, reservation->current_fund, reservation->goal);
-    
-    fclose(reservations_file);
+    log_new_reservation(reservation);
   }
   else if(type == UPDATE_RESERVATION)
   { /** reservation update log */
@@ -126,7 +128,7 @@ int log_reservation_helper(reservation_t *reservation, char *type)
   char final_message[MESSAGE_LEN];
   char message[1024];
     
-  sprintf(message, "%d,%s,%d,%d,%s\n", reservation->id, reservation->name, reservation->current_fund, reservation->goal, type);
+  sprintf(message, "%d,%s,%d,%d,%s\n", reservation->id, reservation->name, reservation->goal, reservation->current_fund, type);
     
   strcpy(final_message, date);
   strcat(final_message, ",");

@@ -17,38 +17,27 @@ extern int new_reservation()
   
   printf("what is the name of your reservation: ");
   char name_buffer[100];
-  flush_input_buffer();
+  // flush_input_buffer();
   fgets(name_buffer, 100, stdin);
   shave_newline(name_buffer);
   strcpy(reservation->name, name_buffer);
   
   printf("what is the fund goal of %s: ", reservation->name);
   int goal;
-  scanf("%d", &goal);
+  scanf("%d", &goal); getchar();
   reservation->goal = goal;
   
   printf("initialise the funding (enter 0 if no funding): ");
   int current_fund;
-  scanf("%d", &current_fund);
+  scanf("%d", &current_fund); getchar();
   reservation->current_fund = current_fund;
   
-  num_of_reservations++;
+  update_number_of_reservations();
   reservation->id = num_of_reservations;
   
   log_reservation(reservation, NEW_RESERVATION);
   
-  reserved += goal;
-  
-  FILE *number_of_reservations_file = fopen("account_data/number_of_reservations","w");
-  if(number_of_reservations_file == NULL)
-  {
-    fprintf(stderr, "unable to open number of reservations file.\n");
-    return CANT_OPEN_FILE;
-  }
-  
-  fprintf(number_of_reservations_file, "%d", reserved);
-  
-  fclose(number_of_reservations_file);
+  update_reserved(goal);
   
   sort_reservations_file_with_loading();
   
@@ -61,10 +50,9 @@ extern int check_reservation()
 {
   printf("enter name or keyword: ");
   char name[MESSAGE_LEN];
-  flush_input_buffer();
+  // flush_input_buffer();
   fgets(name, MESSAGE_LEN, stdin);
-  flush_input_buffer();
-  
+  shave_newline(name);
   /**
    * 1. load the reservations
    * 2. search for reservations
@@ -84,6 +72,8 @@ extern int check_reservation()
     return NOT_FOUND;
   }
   
+  printf("found: %d reservations with %s.\n\n", (interval.right - interval.left + 1), name);
+  
   for(int i = interval.left; i < (interval.right + 1); i++)
     print_reservation(reservation_list[i]);
   
@@ -95,9 +85,9 @@ extern int update_reservation()
 {
   printf("enter name or keyword: ");
   char name[MESSAGE_LEN];
-  flush_input_buffer();
+  // flush_input_buffer();
   fgets(name, MESSAGE_LEN, stdin);
-  flush_input_buffer();
+  shave_newline(name);
   
   reservation_t *reservation_list = malloc(num_of_reservations * sizeof(reservation_t));
   // check for error
@@ -111,36 +101,42 @@ extern int update_reservation()
     return NOT_FOUND;
   }
   
+  int index;
   if ((interval.right - interval.left) != 0)
   {
     printf("multiple reservations found. pick one:\n");
     for(int i = interval.left; i < (interval.right + 1); i++)
       printf("  [%d] %s\n", i, reservation_list[i].name);
+    
+    printf("your choice: ");
+    // flush_input_buffer();
+    scanf("%d", &index); getchar();
+    printf("\n");
   }
-  printf("your choice: ");
-  int index;
-  scanf("%d", &index);
-  flush_input_buffer();
-  printf("\n\n");
+  else
+    index = interval.right;
   
-  printf("reservation you searched for: \n");
+  printf("reservation you searched for: \n\n");
   print_reservation(reservation_list[index]);
   
   bool exit_flag = false;
   while (!exit_flag)
   {
-    printf("  [1] rename\n  [2] update funding\n  [3] go back\nyour choice: ");
+    printf("options:\n  [1] rename\n  [2] update funding\n  [3] go back\nyour choice: ");
     char choice;
-    scanf("%c", &choice);
+    // flush_input_buffer();
+    scanf("%c", &choice); getchar();
     
     switch(choice)
     {
       case '1':
         rename_reservation(&reservation_list[index]);
+        reload_reservations_file(reservation_list);
         printf("%s", DIVIDER);
         break;
       case '2':
         update_funding(&reservation_list[index]);
+        reload_reservations_file(reservation_list);
         printf("%s", DIVIDER);
         break;
       case '3':
@@ -152,7 +148,6 @@ extern int update_reservation()
         printf("%s", DIVIDER);
         break;
     }
-    flush_input_buffer();
   }
   
   reload_reservations_file(reservation_list);
