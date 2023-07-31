@@ -43,25 +43,25 @@ void shave_newline(char *line)
   return;
 }
 
-int update_available()
+int update_available(int new_goal)
 {
-  printf("entering: update_available\n");
+  // printf("entering: update_available\n");
   FILE *available_file = fopen("account_data/available","w");
   // check error
   
-  available -= reserved;
+  available -= new_goal;
   
   fprintf(available_file, "%d", available);
   
   fclose(available_file);
   
-  printf("leaving: update_available\n");
+  // printf("leaving: update_available\n");
   return OK;
 }
 
 int update_reserved(int goal)
 {
-  printf("entering: update_reserved\n");
+  // printf("entering: update_reserved\n");
   FILE *reserved_file = fopen("account_data/reserved", "w");
   // check error
   
@@ -71,10 +71,8 @@ int update_reserved(int goal)
   
   fclose(reserved_file);
   
-  update_available();
-  
   load_data();
-  printf("leaving: update_reserved\n");
+  // printf("leaving: update_reserved\n");
   return OK;
 }
 
@@ -140,7 +138,7 @@ int update_funding(reservation_t *reservation)
   // flush_input_buffer();
   scanf("%d", &current_funding); getchar();
   
-  reservation->current_fund = current_funding;
+  reservation->current_fund += current_funding;
   
   return OK;
 }
@@ -152,16 +150,14 @@ void binary_search_ret_interval(reservation_t *reservation_list, char *target, i
    * 2. binary search to return the index of the last target
    * 3. put left and right index to corresponding arguments
   */
-  printf("entering: binary_search\n");
   *left_end = lower_bound(reservation_list, target);
   *right_end = upper_bound(reservation_list, target);
-  printf("leaving: binary_search\n");
   return;
 }
 
 int lower_bound(reservation_t* reservation_list, char* target)
 {
-  printf("entering: lower_bound\n");
+  // printf("entering: lower_bound\n");
   int l = 0, d = num_of_reservations - 1;
   int s;
   while(l < d)
@@ -174,7 +170,7 @@ int lower_bound(reservation_t* reservation_list, char* target)
     else
       d = --s;
   }
-  printf("leaving: lower_bound\n");
+  // printf("leaving: lower_bound\n");
   if (l < num_of_reservations)
     return l;
   else
@@ -183,39 +179,48 @@ int lower_bound(reservation_t* reservation_list, char* target)
 
 int upper_bound(reservation_t *reservation_list, char* target)
 {
-  printf("entering: upper bound\n");
+  // printf("entering: upper bound\n");
   int l = 0, d = num_of_reservations - 1;
-  int s, iter = 0;
+  int s; // iter = 0;
   while(l < d)
   {
-    printf("upper bound iter: %d\n", iter);
-    iter++;
-    if(iter == 2*num_of_reservations)
-      break;
+    // printf("upper bound iter: %d\n", iter);
+    // iter++;
+    // if(iter == 2*num_of_reservations)
+      // break;
     s = l + (d-l)/2+1;
-    printf("s is: %d\nl is: %d and d is: %d\n", s,l,d);
-    printf("is %s a substring of %s? ", target, reservation_list[s].name);
+    // printf("s is: %d\nl is: %d and d is: %d\n", s,l,d);
+    // printf("is %s a substring of %s?\n", target, reservation_list[s].name);
     if(strstr(reservation_list[s].name, target) != NULL)
     {
-      printf("it is\n");
+      // printf("%s is a substring of %s.\n", target, reservation_list[s].name);
       l = s;
     }
     else if(strcmp(reservation_list[s].name, target) < 0)
     {
-      printf("it is\n");
+      // printf("%s is not a substring of %s.\nalso, it's lexicographically after it.\n", target, reservation_list[s].name);
       l = s+1;
     }
     else
+    {
+      // printf("%s is not a substring of %s.\nalso, it's lexicographically before it.\n", target, reservation_list[s].name);
       d = s-1;
+    }
   }
-  printf("leaving: upper bound\n");
-  if (d > 0 && d < num_of_reservations)
+  // printf("leaving: upper bound\n");
+  if ((d > 0 && d < num_of_reservations) && (l > 0 && l < num_of_reservations))
+  {
+    // printf("found something.\n");
     return d;
+  }
   else
+  {
+    // printf("found nothing.\n");
     return NOT_FOUND;
+  }
 }
 
-int swap_reservations(reservation_t *reservation1, reservation_t *reservation2, int iteration)
+int swap_reservations(reservation_t *reservation1, reservation_t *reservation2)
 {
   // printf("entering %d: swap_reservations\n", iteration);
   reservation_t *temp = malloc(sizeof(reservation_t));
@@ -244,7 +249,7 @@ int partition(reservation_t *reservation_list, int left, int right)
     {
       i++;
       // printf("partition 2\n");
-      swap_reservations(&reservation_list[i], &reservation_list[j], j);
+      swap_reservations(&reservation_list[i], &reservation_list[j]);
       // printf("partition 3\n");
     }
     // printf("partition %d loop leave\n", j);
@@ -252,7 +257,7 @@ int partition(reservation_t *reservation_list, int left, int right)
   
   int pivot_index = (i + 1);
   // printf("partition 4\n");
-  swap_reservations(&reservation_list[pivot_index], &reservation_list[right],j);
+  swap_reservations(&reservation_list[pivot_index], &reservation_list[right]);
   // printf("leaving: partition\n");
   return pivot_index;
 }
@@ -326,7 +331,7 @@ int sort_reservations_file(reservation_t *reservation_list)
 
 void print_reservation(reservation_t reservation)
 {
-  printf("reservation name: %s\nreservation goal: %d\nreservation funds: %d\n\n",
+  printf("name: %s\n - goal: %d\n - funds: %d\n\n",
   reservation.name, reservation.goal, reservation.current_fund);
   
   return;

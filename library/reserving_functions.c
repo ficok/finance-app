@@ -38,6 +38,7 @@ extern int new_reservation()
   log_reservation(reservation, NEW_RESERVATION);
   
   update_reserved(goal);
+  update_available(goal);
   
   sort_reservations_file_with_loading();
   
@@ -72,7 +73,7 @@ extern int check_reservation()
     return NOT_FOUND;
   }
   
-  printf("found: %d reservations with %s.\n\n", (interval.right - interval.left + 1), name);
+  printf("found: %d reservation(s) containing %s.\n\n", (interval.right - interval.left + 1), name);
   
   for(int i = interval.left; i < (interval.right + 1); i++)
     print_reservation(reservation_list[i]);
@@ -130,27 +131,31 @@ extern int update_reservation()
     switch(choice)
     {
       case '1':
+        printf("- rename\n%s", DIVIDER);
         rename_reservation(&reservation_list[index]);
-        reload_reservations_file(reservation_list);
         printf("%s", DIVIDER);
         break;
       case '2':
+        printf("- update funding\n%s", DIVIDER);
         update_funding(&reservation_list[index]);
-        reload_reservations_file(reservation_list);
         printf("%s", DIVIDER);
         break;
       case '3':
         exit_flag = true;
-        printf("%s", DIVIDER);
+        printf("- going back\n");
         break;
       default:
         printf("incorrect input.\n");
+        flush_input_buffer();
         printf("%s", DIVIDER);
         break;
     }
   }
   
-  reload_reservations_file(reservation_list);
+  reload_reservations_file(reservation_list, NULL, NULL);
   
+  log_reservation(&reservation_list[index], UPDATE_RESERVATION);
+  
+  free(reservation_list);
   return OK;
 }

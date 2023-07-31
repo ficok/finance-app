@@ -91,12 +91,22 @@ int load_reservations(reservation_t *reservation_list)
   return OK;
 }
 
-int reload_reservations_file(reservation_t *reservation_list)
+int reload_reservations_file(reservation_t *reservation_list, char *last_name, int *new_index)
 {
   sort_reservations_file(reservation_list);
   // flush_input_buffer();
   load_data();
   // flush_input_buffer();
   
+  if(last_name == NULL && new_index == NULL)
+    return OK;
+  
+  interval_t interval = search_for_reservation(reservation_list, last_name);
+  if(interval.right - interval.left != 0)
+  {
+    printf("error while retrieving the new index.\n");
+    return SEARCH_ERROR;
+  }
+  *new_index = interval.right;
   return OK;
 }

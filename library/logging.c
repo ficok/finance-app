@@ -79,7 +79,7 @@ extern int log_reservation(reservation_t *reservation, int type)
   }
   else if(type == UPDATE_RESERVATION)
   { /** reservation update log */
-    
+    log_reservation_helper(reservation, "update reservation");
   }
   else /** type == DELETE_RESERVATION */
   { /** reservation deletion log */
@@ -128,7 +128,7 @@ int log_reservation_helper(reservation_t *reservation, char *type)
   char final_message[MESSAGE_LEN];
   char message[1024];
     
-  sprintf(message, "%d,%s,%d,%d,%s\n", reservation->id, reservation->name, reservation->goal, reservation->current_fund, type);
+  sprintf(message, "%s,%d,%d,%s\n", reservation->name, reservation->goal, reservation->current_fund, type);
     
   strcpy(final_message, date);
   strcat(final_message, ",");

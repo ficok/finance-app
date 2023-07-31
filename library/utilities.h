@@ -17,7 +17,7 @@ extern char *create_current_date(void);
 extern void flush_input_buffer(void);
 extern void shave_newline(char *line);
 
-extern int update_available(void);
+extern int update_available(int);
 extern int update_reserved(int);
 extern int update_number_of_reservations(void);
 
@@ -33,7 +33,7 @@ extern int sort_reservations_file(reservation_t*);
 extern int sort_reservations_file_with_loading(void);
 extern int quick_sort_reservation_list(reservation_t*, int, int);
 
-extern int swap_reservations(reservation_t*, reservation_t*, int);
+extern int swap_reservations(reservation_t*, reservation_t*);
 extern int partition(reservation_t *reservation_list, int left, int right);
 
 #endif
