@@ -1,6 +1,13 @@
 ## A personal finance app
 ***>> a work in progress***
 
+### Installation:
+1. clone this repository: `git clone https://github.com/ficok/finance-app finance-app`
+2. add the folder `finance-app` to path (with this, you will be able to run it from your terminal with just `finance-app`)
+
+### Updating:
+- in the `finance-app` folder: `git pull`
+
 ### Features
 - adding and spending money
 - saving how much money is available
