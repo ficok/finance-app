@@ -20,17 +20,7 @@ int main()
   load_data();
   while (!exit_flag)
   {
-    /**
-     * to lessen the footprint of this function, rework everything such that
-     * it is called only:
-     * 1. when program starts
-     * 2. after any changes are made
-     *    - new reservation
-     *    - update reservation
-     *    - delete reservation
-    */ // load_data();
     printf("available money: %d\nreserved money: %d\nnumber of reservations: %d\n\nwhat would you like to do?\n  [1] add money\n  [2] spend money\n  [3] reservations\n  [4] show transaction log\n  [5] exit\nyour choice: ", available, reserved, num_of_reservations);
-    
     
     char choice;
     scanf("%c",&choice); getchar();
