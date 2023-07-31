@@ -1,5 +1,5 @@
 ### Introduction:
-A termianl-based app for managing personal finance.
+A terminal-based app for managing personal finance.
 
 ### Installation:
 1. clone this repository: `git clone https://github.com/ficok/finance-app finance-app`
