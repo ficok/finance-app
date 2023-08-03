@@ -18,7 +18,7 @@ int main()
 {
   bool exit_flag = false;
   load_data();
-  while (!exit_flag)
+  while(!exit_flag)
   {
     printf("available money: %d\nreserved money: %d\nnumber of reservations: %d\n\nwhat would you like to do?\n  [1] add money\n  [2] spend money\n  [3] reservations\n  [4] show transaction log\n  [5] exit\nyour choice: ", available, reserved, num_of_reservations);
     
